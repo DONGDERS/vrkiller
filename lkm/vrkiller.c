@@ -119,13 +119,6 @@ static unsigned long __nocfi vk_btf_funcs(filp_open_t f_open,
         unsigned long pay;
         if (kind == 4) { /* STRUCT */
             unsigned long j, m = p + 12;
-            unsigned int sn = b[p] | (b[p+1] << 8) | (b[p+2] << 16) | ((unsigned int)b[p+3] << 24);
-            /* 先校验结构体名：BTF 序里第一个带 funcs 成员的结构体
-             * 不保证是 tracepoint（dfroot 原版漏了这一层，侥幸命中） */
-            if (strtab + sn >= (unsigned long)n)
-                goto next_type;
-            if (strcmp((const char *)b + strtab + sn, "tracepoint"))
-                goto next_type;
             if (m + (unsigned long)vlen * 12 > tp_end) break;
             for (j = 0; j < vlen; j++, m += 12) {
                 unsigned int mn = b[m] | (b[m+1] << 8) | (b[m+2] << 16) | ((unsigned int)b[m+3] << 24);
@@ -140,7 +133,6 @@ static unsigned long __nocfi vk_btf_funcs(filp_open_t f_open,
                 }
             }
         }
-next_type:
         pay = 0;
         switch (kind) {
             case 1: pay = 4; break;              /* INT */
