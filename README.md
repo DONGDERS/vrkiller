@@ -16,6 +16,7 @@
 使用任意可获取Root的终端
 su
 cp /sdcard/你的文件 /data/local/tmp
+chmod 777 /data/local/tmp/vrkiller
 /data/local/tmp/vrkiller
 ```
 
