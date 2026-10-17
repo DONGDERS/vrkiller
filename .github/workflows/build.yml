@@ -1,0 +1,51 @@
+name: build
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  vrkiller:
+    name: vrkiller.ko / ${{ matrix.kmi }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        kmi:
+          - android12-5.10
+          - android13-5.10
+          - android13-5.15
+          - android14-5.15
+          - android14-6.1
+          - android15-6.6
+          - android16-6.12
+          - android17-6.18
+      fail-fast: false
+    container:
+      image: ghcr.io/ylarod/ddk-min:${{ matrix.kmi }}-20260828
+      options: --privileged
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Build vrkiller.ko
+        run: |
+          cd lkm
+          make -j$(nproc)
+          llvm-objcopy --strip-unneeded \
+            -R .comment -R .note.gnu.property \
+            -R .note.Linux -R .note.GNU-stack \
+            -R .BTF -R .BTF.base -R .llvm_addrsig \
+            -R .hyp.text -R .hyp.bss -R .hyp.rodata -R .hyp.event_ids \
+            -R .hyp.patchable_function_entries -R .hyp.data vrkiller.ko
+          llvm-readelf -n vrkiller.ko
+          mkdir -p $GITHUB_WORKSPACE/out
+          cp vrkiller.ko $GITHUB_WORKSPACE/out/vrkiller-${{ matrix.kmi }}.ko
+
+      - name: Upload vrkiller.ko
+        uses: actions/upload-artifact@v7
+        with:
+          name: vrkiller-${{ matrix.kmi }}
+          path: out/vrkiller-${{ matrix.kmi }}.ko
