@@ -34,3 +34,8 @@ chmod 777 /data/local/tmp/vrkiller
 - `pack/`：打包器（C），把 8 颗 ko 嵌进单文件二进制，NDK 静态编译
 
 Release 页提供已打包的 `vrkiller` 二进制。
+## License
+本项目使用 [GNU General Public License v2.0](LICENSE)。
+其中 `lkm-vrkiller/` 内核模块依赖 Linux 内核导出符号（GPL-2.0），因此沿用 GPL-2.0。
+
+This project is licensed under the [GNU General Public License v2.0](LICENSE).
